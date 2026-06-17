@@ -1,0 +1,21 @@
+{
+  "name": "agent-runbook-skill",
+  "version": "0.1.0",
+  "description": "Turn Markdown runbooks into bounded dry-run agent action plans.",
+  "type": "module",
+  "bin": {
+    "agent-runbook": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check bin/cli.js",
+    "build": "npm run check",
+    "smoke": "node bin/cli.js fixtures/release-runbook.md"
+  },
+  "keywords": [
+    "agent-skill",
+    "cli",
+    "dry-run"
+  ],
+  "license": "MIT"
+}
