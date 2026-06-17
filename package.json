@@ -11,7 +11,8 @@
     "check": "node --check src/index.js && node --check bin/cli.js",
     "build": "npm run check",
     "smoke": "node bin/cli.js fixtures/release-runbook.md",
-    "package:smoke": "npm pack --dry-run"
+    "package:smoke": "npm pack --dry-run",
+    "release:check": "bash scripts/validate.sh && npm run package:smoke"
   },
   "keywords": [
     "agent-skill",
@@ -22,5 +23,16 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rogerchappel/agent-runbook-skill.git"
-  }
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "fixtures",
+    "SKILL.md",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
+  ]
 }
