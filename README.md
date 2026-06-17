@@ -9,6 +9,12 @@ npm test
 npm run smoke
 ```
 
+Run the full release-readiness gate before publishing or opening a release PR:
+
+```bash
+npm run release:check
+```
+
 ## CLI
 
 ```bash
