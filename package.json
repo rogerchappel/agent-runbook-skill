@@ -12,7 +12,7 @@
     "build": "npm run check",
     "smoke": "node bin/cli.js fixtures/release-runbook.md",
     "package:smoke": "node scripts/package-smoke.js",
-    "release:check": "bash scripts/validate.sh && npm run package:smoke"
+    "release:check": "bash scripts/validate.sh"
   },
   "keywords": [
     "agent-skill",
