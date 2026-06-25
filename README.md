@@ -15,6 +15,10 @@ Run the full release-readiness gate before publishing or opening a release PR:
 npm run release:check
 ```
 
+`npm run package:smoke` dry-runs the npm tarball and asserts that the CLI,
+library source, fixture runbook, key docs, `SKILL.md`, README, and license are
+included in the published surface.
+
 ## CLI
 
 ```bash
