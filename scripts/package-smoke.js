@@ -12,10 +12,13 @@ const required = [
   "fixtures/release-runbook.md",
   "docs/PRD.md",
   "docs/TASKS.md",
+  "docs/RELEASE_CANDIDATE.md",
   "docs/LIMITATIONS.md",
   "SKILL.md",
   "README.md",
-  "LICENSE"
+  "LICENSE",
+  "SECURITY.md",
+  "CONTRIBUTING.md"
 ];
 
 const missing = required.filter((file) => !files.has(file));
