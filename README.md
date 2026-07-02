@@ -5,6 +5,8 @@ Turn Markdown runbooks into bounded dry-run agent action plans.
 ## Quickstart
 
 ```bash
+npm install -g agent-runbook-skill
+agent-runbook fixtures/release-runbook.md
 npm test
 npm run smoke
 ```
@@ -25,6 +27,12 @@ published surface.
 ```bash
 node bin/cli.js fixtures/release-runbook.md
 node bin/cli.js fixtures/release-runbook.md --json
+```
+
+After global installation the same command is available as:
+
+```bash
+agent-runbook fixtures/release-runbook.md
 ```
 
 ## Library
