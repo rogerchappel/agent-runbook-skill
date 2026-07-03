@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { buildPlan } from '../src/index.js';
 
@@ -10,4 +11,10 @@ test('classifies runbook actions and approval boundaries', () => {
   assert.equal(plan.counts['external-write'], 1);
   assert.equal(plan.counts['approval-required'], 2);
   assert.ok(plan.validation.some(item => item.includes('human sign-off')));
+});
+
+test('prints the package version', () => {
+  const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+  const output = execFileSync('node', ['bin/cli.js', '--version'], { encoding: 'utf8' });
+  assert.equal(output.trim(), packageJson.version);
 });
