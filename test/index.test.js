@@ -18,3 +18,10 @@ test('prints the package version', () => {
   const output = execFileSync('node', ['bin/cli.js', '--version'], { encoding: 'utf8' });
   assert.equal(output.trim(), packageJson.version);
 });
+
+test('prints usage help', () => {
+  const output = execFileSync('node', ['bin/cli.js', '--help'], { encoding: 'utf8' });
+  assert.match(output, /Usage: agent-runbook/);
+  assert.match(output, /<runbook\.md>/);
+  assert.match(output, /--json/);
+});
