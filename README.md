@@ -15,8 +15,12 @@ npm run smoke
 Run the full release-readiness gate before publishing or opening a release PR:
 
 ```bash
+npm run release:readiness
 npm run release:check
 ```
+
+`npm run release:readiness` validates package metadata, CLI bin metadata, npm
+allowlist coverage, required support docs, and CI presence.
 
 `npm run package:smoke` dry-runs the npm tarball and asserts that the CLI,
 library source, fixture runbook, key docs, `SKILL.md`, README, license,
