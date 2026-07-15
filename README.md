@@ -64,3 +64,7 @@ npm run smoke
 ## Limitations
 
 The heuristics are intentionally conservative. Review output before using it in an automated workflow.
+
+## Release notes
+
+Before tagging a release, confirm the smoke fixture still represents the intended workflow and summarize any changed output, limitations, or operator steps in the PR.
