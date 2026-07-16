@@ -38,7 +38,9 @@
     "LICENSE",
     "SECURITY.md",
     "CONTRIBUTING.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "scripts",
+    "test"
   ],
   "bugs": {
     "url": "https://github.com/rogerchappel/agent-runbook-skill/issues"
