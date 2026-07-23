@@ -48,6 +48,20 @@ Import from `src/index.js` for local automation and tests.
 
 This project is local-first and read-only. It prints plans or reports to stdout and does not call external services. Treat any generated mention of publishing, deploying, messaging, deleting, or merging as requiring separate approval.
 
+Runbook actions are assigned one of five side-effect classes:
+
+- `inspect` for read-only local review
+- `external-read` for reads from remote services
+- `local-change` for edits, builds, tests, and generated files
+- `external-write` for publishing, deploying, messaging, and other remote mutations
+- `approval-required` for explicit approval gates and imperative destructive commands
+
+Destructive commands such as `Delete the production database`, `Remove the
+stale deployment`, or `Run rm ...` are classified as `approval-required`.
+Inspection wording such as `Review removal logs` remains `inspect`; mentioning
+a destructive operation while reviewing its policy is not itself an
+instruction to perform that operation.
+
 
 ## Verification
 
@@ -63,7 +77,12 @@ npm run smoke
 
 ## Limitations
 
-The heuristics are intentionally conservative. Review output before using it in an automated workflow.
+The keyword heuristics are intentionally conservative, but they do not parse
+arbitrary natural language or shell syntax. Destructive verbs are recognized
+at the start of an action or after command words and sequencing conjunctions.
+Domain-specific or unusually phrased actions can still be misclassified.
+Review output before using it in an automated workflow; a class is never
+authorization to execute the action.
 
 ## Release notes
 
