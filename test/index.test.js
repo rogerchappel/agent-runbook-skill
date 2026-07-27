@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { buildPlan, classifyAction } from '../src/index.js';
+import { buildPlan, classifyAction, parseRunbook } from '../src/index.js';
 
 test('classifies runbook actions and approval boundaries', () => {
   const plan = buildPlan(readFileSync(new URL('../fixtures/release-runbook.md', import.meta.url), 'utf8'));
@@ -41,6 +41,42 @@ test('keeps non-destructive inspection wording read-only', () => {
   ]) {
     assert.equal(classifyAction(action), 'inspect', action);
   }
+});
+
+test('ignores headings and actions inside fenced examples', () => {
+  const actions = parseRunbook([
+    '## Preparation',
+    '- Inspect current logs',
+    '```sh',
+    '## Fake section',
+    '- Delete production database',
+    '```',
+    '1. Inspect service health'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ section, text }) => ({ section, text })), [
+    { section: 'Preparation', text: 'Inspect current logs' },
+    { section: 'Preparation', text: 'Inspect service health' }
+  ]);
+});
+
+test('supports tilde fences and longer fence markers', () => {
+  const actions = parseRunbook([
+    '# Operations',
+    '~~~~ markdown',
+    '### Not a real section',
+    '* Publish a release',
+    '~~~',
+    '~~~~',
+    '```',
+    '- Also ignored',
+    '```',
+    '- Review the release checklist'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ section, text }) => ({ section, text })), [
+    { section: 'Operations', text: 'Review the release checklist' }
+  ]);
 });
 
 test('prints the package version', () => {
