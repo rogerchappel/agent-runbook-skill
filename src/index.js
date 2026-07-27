@@ -14,7 +14,20 @@ export function parseRunbook(markdown) {
   const lines = markdown.split(/\r?\n/);
   const actions = [];
   let section = 'Overview';
+  let fence = null;
   for (const raw of lines) {
+    if (fence) {
+      const closingFence = raw.match(/^\s{0,3}(`{3,}|~{3,})\s*$/);
+      if (closingFence && closingFence[1][0] === fence.marker && closingFence[1].length >= fence.length) {
+        fence = null;
+      }
+      continue;
+    }
+    const openingFence = raw.match(/^\s{0,3}(`{3,}|~{3,})(.*)$/);
+    if (openingFence) {
+      fence = { marker: openingFence[1][0], length: openingFence[1].length };
+      continue;
+    }
     const heading = raw.match(/^(#{1,3})\s+(.+)$/);
     if (heading) { section = heading[2].trim(); continue; }
     const task = raw.match(/^\s*(?:[-*]|\d+[.])\s+(?:\[[ xX]\]\s*)?(.+)$/);
