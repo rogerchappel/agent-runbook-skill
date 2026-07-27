@@ -22,10 +22,9 @@ npm run release:check
 `npm run release:readiness` validates package metadata, CLI bin metadata, npm
 allowlist coverage, required support docs, and CI presence.
 
-`npm run package:smoke` dry-runs the npm tarball and asserts that the CLI,
-library source, fixture runbook, key docs, `SKILL.md`, README, license,
-security policy, contributing guide, and changelog are included in the
-published surface.
+`npm run package:smoke` builds and installs the npm tarball in a disposable
+consumer, then verifies the root library import and packaged CLI in addition
+to the expected published files.
 
 ## CLI
 
@@ -42,7 +41,19 @@ agent-runbook fixtures/release-runbook.md
 
 ## Library
 
-Import from `src/index.js` for local automation and tests.
+After installing the package, import the documented API from the package root:
+
+```js
+import {
+  buildPlan,
+  classifyAction,
+  parseRunbook,
+  renderMarkdown
+} from 'agent-runbook-skill';
+```
+
+`parseRunbook` ignores headings and list items inside balanced backtick or
+tilde code fences, so example commands do not become executable plan actions.
 
 ## Safety Notes
 
