@@ -13,6 +13,8 @@ requireField('repository.url', pkg.repository?.url);
 requireField('bugs.url', pkg.bugs?.url);
 requireField('homepage', pkg.homepage);
 requireField('license', pkg.license);
+requireField('main', pkg.main);
+requireField('exports["."]', pkg.exports?.['.']);
 requireField('bin.agent-runbook', pkg.bin?.['agent-runbook']);
 
 for (const script of ['check', 'test', 'smoke', 'package:smoke', 'release:check']) {
