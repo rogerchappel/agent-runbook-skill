@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { buildPlan, classifyAction, parseRunbook } from '../src/index.js';
 
@@ -33,11 +33,34 @@ test('requires approval for imperative destructive actions', () => {
   assert.equal(plan.validation.length, 2);
 });
 
+test('requires approval for destructive commands with execution prefixes', () => {
+  for (const action of [
+    'Run sudo rm -rf ./build-cache',
+    'Execute env FORCE=1 rmdir ./generated',
+    'sudo unlink ./obsolete-link'
+  ]) {
+    assert.equal(classifyAction(action), 'approval-required', action);
+  }
+});
+
+test('classifies common local filesystem mutations as local changes', () => {
+  for (const action of [
+    'Create a file for the generated report',
+    'Move the report to the archive directory',
+    'Copy config.example.json to config.json',
+    'Rename the draft file'
+  ]) {
+    assert.equal(classifyAction(action), 'local-change', action);
+  }
+});
+
 test('keeps non-destructive inspection wording read-only', () => {
   for (const action of [
     'Inspect the database deletion policy',
     'Review removal logs',
-    'Check delete permissions'
+    'Check delete permissions',
+    'Review how to move a file safely',
+    'Inspect sudo rm guidance'
   ]) {
     assert.equal(classifyAction(action), 'inspect', action);
   }
@@ -90,4 +113,22 @@ test('prints usage help', () => {
   assert.match(output, /Usage: agent-runbook/);
   assert.match(output, /<runbook\.md>/);
   assert.match(output, /--json/);
+});
+
+test('rejects unknown options with a usage error', () => {
+  const result = spawnSync('node', ['bin/cli.js', '--wat', 'fixtures/release-runbook.md'], { encoding: 'utf8' });
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /Unknown option: --wat/);
+  assert.match(result.stderr, /Usage: agent-runbook/);
+});
+
+test('rejects unexpected extra positional arguments with a usage error', () => {
+  const result = spawnSync('node', [
+    'bin/cli.js',
+    'fixtures/release-runbook.md',
+    'fixtures/release-runbook.md'
+  ], { encoding: 'utf8' });
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /Unexpected argument: fixtures\/release-runbook\.md/);
+  assert.match(result.stderr, /Usage: agent-runbook/);
 });
