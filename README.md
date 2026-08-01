@@ -31,7 +31,12 @@ to the expected published files.
 ```bash
 node bin/cli.js fixtures/release-runbook.md
 node bin/cli.js fixtures/release-runbook.md --json
+node bin/cli.js --help
 ```
+
+The CLI accepts exactly one runbook path and the optional `--json` flag.
+Unknown options and extra positional arguments print usage and exit with status
+2.
 
 After global installation the same command is available as:
 
@@ -68,10 +73,12 @@ Runbook actions are assigned one of five side-effect classes:
 - `approval-required` for explicit approval gates and imperative destructive commands
 
 Destructive commands such as `Delete the production database`, `Remove the
-stale deployment`, or `Run rm ...` are classified as `approval-required`.
+stale deployment`, `Run sudo rm ...`, or `Execute env FORCE=1 rmdir ...` are
+classified as `approval-required`. Imperative local filesystem actions such as
+`Create a file`, `Move the report`, or `Rename the draft` are `local-change`.
 Inspection wording such as `Review removal logs` remains `inspect`; mentioning
-a destructive operation while reviewing its policy is not itself an
-instruction to perform that operation.
+a destructive or mutating operation while reviewing its policy is not itself
+an instruction to perform that operation.
 
 
 ## Verification
