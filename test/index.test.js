@@ -66,6 +66,57 @@ test('keeps non-destructive inspection wording read-only', () => {
   }
 });
 
+test('keeps external-write policy and review wording read-only', () => {
+  for (const action of [
+    'Review the policy for sending email',
+    'Inspect the deployment history',
+    'Review how to publish a release safely',
+    'Check the rules for opening a pull request',
+    'Read the repository creation policy',
+    'Review merge permissions'
+  ]) {
+    assert.equal(classifyAction(action), 'inspect', action);
+  }
+
+  const plan = buildPlan([
+    '- Review the policy for sending email',
+    '- Inspect the deployment history'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, false);
+  assert.equal(plan.counts.inspect, 2);
+  assert.equal(plan.counts['external-write'], undefined);
+  assert.equal(plan.validation.length, 0);
+});
+
+test('classifies imperative remote mutations as external writes', () => {
+  for (const action of [
+    'Push the release branch',
+    'Post the announcement',
+    'Send the release email',
+    'Publish the package',
+    'Deploy the application',
+    'Merge the pull request',
+    'Create a repository for the project',
+    'Open a pull request',
+    'Write to Slack with the results',
+    'Email the maintainers',
+    'Build the package and then publish it'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  const plan = buildPlan([
+    '- Review the deployment policy',
+    '- Publish the package'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts.inspect, 1);
+  assert.equal(plan.counts['external-write'], 1);
+  assert.equal(plan.validation.length, 1);
+});
+
 test('ignores headings and actions inside fenced examples', () => {
   const actions = parseRunbook([
     '## Preparation',
