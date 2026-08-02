@@ -32,9 +32,9 @@ export function parseRunbook(markdown) {
       fence = { marker: openingFence[1][0], length: openingFence[1].length };
       continue;
     }
-    const heading = raw.match(/^(#{1,3})\s+(.+)$/);
+    const heading = raw.match(/^(#{1,6})\s+(.+)$/);
     if (heading) { section = heading[2].trim(); continue; }
-    const task = raw.match(/^\s*(?:[-*]|\d+[.])\s+(?:\[[ xX]\]\s*)?(.+)$/);
+    const task = raw.match(/^\s*(?:[-+*]|\d+[.)])\s+(?:\[[ xX]\]\s*)?(.+)$/);
     if (!task) continue;
     const text = task[1].trim();
     if (!text || text.length < 4) continue;
