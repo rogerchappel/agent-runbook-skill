@@ -153,6 +153,65 @@ test('supports tilde fences and longer fence markers', () => {
   ]);
 });
 
+test('assigns actions under every ATX heading level', () => {
+  const actions = parseRunbook([
+    '# Level 1',
+    '- Inspect one',
+    '## Level 2',
+    '- Inspect two',
+    '### Level 3',
+    '- Inspect three',
+    '#### Level 4',
+    '- Inspect four',
+    '##### Level 5',
+    '- Inspect five',
+    '###### Level 6',
+    '- Inspect six'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ section }) => section), [
+    'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6'
+  ]);
+});
+
+test('supports plus bullets and parenthesized ordered-list markers', () => {
+  const actions = parseRunbook([
+    '## Release',
+    '+ Inspect package metadata',
+    '1) Build the package',
+    '2) Publish the package',
+    '+ [x] Confirm human sign-off'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ text, sideEffect }) => ({ text, sideEffect })), [
+    { text: 'Inspect package metadata', sideEffect: 'inspect' },
+    { text: 'Build the package', sideEffect: 'local-change' },
+    { text: 'Publish the package', sideEffect: 'external-write' },
+    { text: 'Confirm human sign-off', sideEffect: 'approval-required' }
+  ]);
+});
+
+test('ignores added Markdown syntax inside fences and malformed list-like prose', () => {
+  const actions = parseRunbook([
+    '#### Verification',
+    '```markdown',
+    '###### Not a real section',
+    '+ Publish the package',
+    '1) Delete production data',
+    '```',
+    '+Inspect without marker spacing',
+    '1)Inspect without marker spacing',
+    '7) ',
+    '####### Not an ATX heading',
+    'ordinary prose',
+    '+ Inspect service health'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ section, text, sideEffect }) => ({ section, text, sideEffect })), [
+    { section: 'Verification', text: 'Inspect service health', sideEffect: 'inspect' }
+  ]);
+});
+
 test('prints the package version', () => {
   const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
   const output = execFileSync('node', ['bin/cli.js', '--version'], { encoding: 'utf8' });
