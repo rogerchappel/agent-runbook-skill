@@ -69,7 +69,7 @@ Runbook actions are assigned one of five side-effect classes:
 - `inspect` for read-only local review
 - `external-read` for reads from remote services
 - `local-change` for edits, builds, tests, and generated files
-- `external-write` for publishing, deploying, messaging, and other remote mutations
+- `external-write` for imperative publishing, deploying, messaging, and other remote mutations
 - `approval-required` for explicit approval gates and imperative destructive commands
 
 Destructive commands such as `Delete the production database`, `Remove the
