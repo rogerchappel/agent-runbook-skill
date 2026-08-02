@@ -59,6 +59,8 @@ import {
 
 `parseRunbook` ignores headings and list items inside balanced backtick or
 tilde code fences, so example commands do not become executable plan actions.
+Outside fences, it recognizes ATX headings from `#` through `######` and list
+items beginning with `-`, `+`, `*`, `N.`, or `N)` (including task checkboxes).
 
 ## Safety Notes
 
@@ -101,6 +103,11 @@ at the start of an action or after command words and sequencing conjunctions.
 Domain-specific or unusually phrased actions can still be misclassified.
 Review output before using it in an automated workflow; a class is never
 authorization to execute the action.
+
+Runbook structure intentionally supports a small Markdown subset: ATX headings
+and unordered or ordered list markers documented above. Setext headings,
+headings deeper than level six, and list-like prose without whitespace after
+the marker are ignored.
 
 ## Release notes
 
