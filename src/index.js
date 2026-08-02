@@ -4,7 +4,9 @@ export function classifyAction(text) {
   if (
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely|permanently|recursively|forcefully)\s+)*(?:(?:sudo|doas|command)\s+|env\s+(?:[a-z_][a-z0-9_]*=[^\s]+\s+)+)*(?:delete|remove|destroy|erase|purge|wipe|drop|truncate|uninstall|rm|rmdir|unlink)\b/.test(value)
   ) return 'approval-required';
-  if (/\b(push|post|send|publish|deploy|merge|create repo|open pr|write to slack|email)\b/.test(value)) return 'external-write';
+  if (
+    /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely)\s+)*(?:push|post|send|publish|deploy|merge|create(?:\s+(?:a|the))?\s+repo(?:sitory)?|open(?:\s+(?:a|the))?\s+(?:pr|pull request)|write\s+to\s+slack|email)\b/.test(value)
+  ) return 'external-write';
   if (/\b(fetch|download|curl|get from|read from api|query)\b/.test(value) && /\b(http|api|remote|github)\b/.test(value)) return 'external-read';
   if (
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely)\s+)*(?:edit|write|commit|test|build|generate|create(?:\s+(?:a|the))?\s+file|update|move|copy|rename|touch|mkdir)\b/.test(value)
