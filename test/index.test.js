@@ -117,6 +117,54 @@ test('classifies imperative remote mutations as external writes', () => {
   assert.equal(plan.validation.length, 1);
 });
 
+test('classifies supported remote mutation commands as external writes', () => {
+  for (const action of [
+    'git push origin main',
+    'npm publish --access public',
+    'gh pr merge 42 --squash',
+    'Build the package and then npm publish'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  for (const action of [
+    'Review the git push policy',
+    'Document npm publish options',
+    'Explain how gh pr merge works'
+  ]) {
+    assert.equal(classifyAction(action), 'inspect', action);
+  }
+
+  const plan = buildPlan([
+    '## Release',
+    '- git push origin release',
+    '- npm publish'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 2);
+  assert.deepEqual(plan.validation, [
+    'Verify A01: git push origin release',
+    'Verify A02: npm publish'
+  ]);
+});
+
+test('CLI reports command-shaped remote mutations as approval-gated', () => {
+  const output = execFileSync('node', ['bin/cli.js', 'fixtures/command-release-runbook.md', '--json'], { encoding: 'utf8' });
+  const plan = JSON.parse(output);
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 3);
+  assert.equal(plan.counts.inspect, 1);
+  assert.deepEqual(plan.actions.map(({ text, sideEffect }) => ({ text, sideEffect })), [
+    { text: 'Review the git push policy', sideEffect: 'inspect' },
+    { text: 'git push origin release', sideEffect: 'external-write' },
+    { text: 'npm publish --access public', sideEffect: 'external-write' },
+    { text: 'gh pr merge 42 --squash', sideEffect: 'external-write' }
+  ]);
+  assert.equal(plan.validation.length, 3);
+});
+
 test('ignores headings and actions inside fenced examples', () => {
   const actions = parseRunbook([
     '## Preparation',
