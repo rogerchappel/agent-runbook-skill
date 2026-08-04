@@ -15,5 +15,7 @@ backtick or tilde fences are ignored.
   parse arbitrary natural language or shell syntax.
 - Inspection phrases that mention deletion or removal remain read-only when
   they do not instruct the destructive operation.
+- Supported remote mutation commands may begin an action directly or follow
+  `Run`, `Execute`, `then`, or `and then`; explanatory mentions remain read-only.
 - Outputs are review aids, not authorization to act.
 - Fixtures cover common cases and should grow with real use.

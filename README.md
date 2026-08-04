@@ -80,12 +80,16 @@ classified as `approval-required`. Imperative local filesystem actions such as
 `Create a file`, `Move the report`, or `Rename the draft` are `local-change`.
 Common command-shaped remote mutations—`git push`, `npm publish`, and
 `gh pr merge`—are classified as `external-write` when they begin an action or
-follow an explicit `then` / `and then` sequence, so `buildPlan` requires
-approval and emits a validation item for them.
+follow an explicit `then` / `and then` sequence. The same boundary accepts an
+explicit `Run` or `Execute` wrapper, including `Run git push origin main`,
+`Execute npm publish`, and `Build the package and then run gh pr merge 42`.
+For all of these forms, `buildPlan` requires approval and emits a validation
+item.
 Inspection wording such as `Review removal logs` remains `inspect`; mentioning
 a destructive or mutating operation while reviewing its policy is not itself
 an instruction to perform that operation. Likewise, prose such as `Review the
-git push policy` or `Explain how gh pr merge works` stays read-only. This
+git push policy`, `Document how to execute npm publish safely`, or `Explain how
+gh pr merge works` stays read-only. This
 deliberately narrow command boundary avoids treating policy, documentation, or
 review prose as an executable mutation.
 
