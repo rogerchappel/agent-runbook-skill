@@ -5,7 +5,7 @@ export function classifyAction(text) {
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely|permanently|recursively|forcefully)\s+)*(?:(?:sudo|doas|command)\s+|env\s+(?:[a-z_][a-z0-9_]*=[^\s]+\s+)+)*(?:delete|remove|destroy|erase|purge|wipe|drop|truncate|uninstall|rm|rmdir|unlink)\b/.test(value)
   ) return 'approval-required';
   if (
-    /(?:^|\b(?:and\s+then|then)\s+)(?:git\s+push|npm\s+publish|gh\s+pr\s+merge)\b/.test(value)
+    /(?:^|\b(?:and\s+then|then)\s+)(?:(?:run|execute)\s+)?(?:git\s+push|npm\s+publish|gh\s+pr\s+merge)\b/.test(value)
   ) return 'external-write';
   if (
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely)\s+)*(?:push|post|send|publish|deploy|merge|create(?:\s+(?:a|the))?\s+repo(?:sitory)?|open(?:\s+(?:a|the))?\s+(?:pr|pull request)|write\s+to\s+slack|email)\b/.test(value)
