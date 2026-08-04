@@ -149,18 +149,52 @@ test('classifies supported remote mutation commands as external writes', () => {
   ]);
 });
 
+test('classifies supported remote mutation commands after execution wrappers', () => {
+  for (const action of [
+    'Run git push origin main',
+    'Execute npm publish --access public',
+    'Run gh pr merge 42 --squash',
+    'Build the package and then run npm publish',
+    'Check the release notes, then execute git push origin release'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  for (const action of [
+    'Review the git push policy',
+    'Document how to execute npm publish safely',
+    'Explain how gh pr merge works'
+  ]) {
+    assert.equal(classifyAction(action), 'inspect', action);
+  }
+
+  const plan = buildPlan([
+    '## Release',
+    '- Run git push origin release',
+    '- Execute npm publish'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 2);
+  assert.deepEqual(plan.validation, [
+    'Verify A01: Run git push origin release',
+    'Verify A02: Execute npm publish'
+  ]);
+});
+
 test('CLI reports command-shaped remote mutations as approval-gated', () => {
   const output = execFileSync('node', ['bin/cli.js', 'fixtures/command-release-runbook.md', '--json'], { encoding: 'utf8' });
   const plan = JSON.parse(output);
 
   assert.equal(plan.requiresApproval, true);
   assert.equal(plan.counts['external-write'], 3);
-  assert.equal(plan.counts.inspect, 1);
+  assert.equal(plan.counts.inspect, 2);
   assert.deepEqual(plan.actions.map(({ text, sideEffect }) => ({ text, sideEffect })), [
     { text: 'Review the git push policy', sideEffect: 'inspect' },
-    { text: 'git push origin release', sideEffect: 'external-write' },
-    { text: 'npm publish --access public', sideEffect: 'external-write' },
-    { text: 'gh pr merge 42 --squash', sideEffect: 'external-write' }
+    { text: 'Explain how gh pr merge works', sideEffect: 'inspect' },
+    { text: 'Run git push origin release', sideEffect: 'external-write' },
+    { text: 'Execute npm publish --access public', sideEffect: 'external-write' },
+    { text: 'Build the package and then run gh pr merge 42 --squash', sideEffect: 'external-write' }
   ]);
   assert.equal(plan.validation.length, 3);
 });
