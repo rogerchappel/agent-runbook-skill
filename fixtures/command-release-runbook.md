@@ -3,9 +3,10 @@
 ## Preparation
 
 - Review the git push policy
+- Explain how gh pr merge works
 
 ## Publish
 
-- git push origin release
-- npm publish --access public
-- gh pr merge 42 --squash
+- Run git push origin release
+- Execute npm publish --access public
+- Build the package and then run gh pr merge 42 --squash

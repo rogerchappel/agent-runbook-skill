@@ -188,12 +188,13 @@ test('CLI reports command-shaped remote mutations as approval-gated', () => {
 
   assert.equal(plan.requiresApproval, true);
   assert.equal(plan.counts['external-write'], 3);
-  assert.equal(plan.counts.inspect, 1);
+  assert.equal(plan.counts.inspect, 2);
   assert.deepEqual(plan.actions.map(({ text, sideEffect }) => ({ text, sideEffect })), [
     { text: 'Review the git push policy', sideEffect: 'inspect' },
-    { text: 'git push origin release', sideEffect: 'external-write' },
-    { text: 'npm publish --access public', sideEffect: 'external-write' },
-    { text: 'gh pr merge 42 --squash', sideEffect: 'external-write' }
+    { text: 'Explain how gh pr merge works', sideEffect: 'inspect' },
+    { text: 'Run git push origin release', sideEffect: 'external-write' },
+    { text: 'Execute npm publish --access public', sideEffect: 'external-write' },
+    { text: 'Build the package and then run gh pr merge 42 --squash', sideEffect: 'external-write' }
   ]);
   assert.equal(plan.validation.length, 3);
 });
