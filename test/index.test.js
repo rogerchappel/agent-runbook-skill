@@ -56,6 +56,12 @@ test('classifies common local filesystem mutations as local changes', () => {
 
 test('keeps non-destructive inspection wording read-only', () => {
   for (const action of [
+    'Review how git commit records changes', 'Document the npm test workflow',
+    'Explain when to run pnpm build', 'Review how to execute yarn test safely',
+    'Document cp and mv portability', 'Explain how mkdir works'
+  ]) assert.equal(classifyAction(action), 'inspect', action);
+
+  for (const action of [
     'Inspect the database deletion policy',
     'Review removal logs',
     'Check delete permissions',
@@ -64,6 +70,17 @@ test('keeps non-destructive inspection wording read-only', () => {
   ]) {
     assert.equal(classifyAction(action), 'inspect', action);
   }
+});
+
+test('classifies supported local commands directly and through execution wrappers', () => {
+  for (const action of [
+    'git commit -am "update fixtures"', 'npm test', 'npm run build',
+    'pnpm test', 'yarn build', 'bun test', 'cp source.txt destination.txt',
+    'mv draft.md final.md', 'touch generated.txt', 'mkdir build-output',
+    'Run git commit -am "update fixtures"', 'Execute npm test', 'Run pnpm build',
+    'Execute yarn run test', 'Copy the fixture, then mv fixture.tmp fixture.md',
+    'Check package metadata and then run npm run build'
+  ]) assert.equal(classifyAction(action), 'local-change', action);
 });
 
 test('keeps external-write policy and review wording read-only', () => {
@@ -197,6 +214,15 @@ test('CLI reports command-shaped remote mutations as approval-gated', () => {
     { text: 'Build the package and then run gh pr merge 42 --squash', sideEffect: 'external-write' }
   ]);
   assert.equal(plan.validation.length, 3);
+});
+
+test('CLI reports command-shaped local mutations without requiring approval', () => {
+  const output = execFileSync('node', ['bin/cli.js', 'fixtures/command-local-runbook.md', '--json'], { encoding: 'utf8' });
+  const plan = JSON.parse(output);
+  assert.equal(plan.requiresApproval, false);
+  assert.equal(plan.counts['local-change'], 4);
+  assert.equal(plan.counts.inspect, 2);
+  assert.equal(plan.validation.length, 4);
 });
 
 test('ignores headings and actions inside fenced examples', () => {
