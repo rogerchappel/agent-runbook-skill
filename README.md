@@ -78,6 +78,11 @@ Destructive commands such as `Delete the production database`, `Remove the
 stale deployment`, `Run sudo rm ...`, or `Execute env FORCE=1 rmdir ...` are
 classified as `approval-required`. Imperative local filesystem actions such as
 `Create a file`, `Move the report`, or `Rename the draft` are `local-change`.
+Supported command-shaped local changes include `git commit`, package test and
+build commands (`npm`, `pnpm`, `yarn`, and `bun`), and the `cp`, `mv`, `touch`,
+and `mkdir` filesystem commands. These commands may begin an action, follow an
+explicit `then` / `and then` sequence, or use an explicit `Run` or `Execute`
+wrapper.
 Common command-shaped remote mutations—`git push`, `npm publish`, and
 `gh pr merge`—are classified as `external-write` when they begin an action or
 follow an explicit `then` / `and then` sequence. The same boundary accepts an
@@ -92,6 +97,8 @@ git push policy`, `Document how to execute npm publish safely`, or `Explain how
 gh pr merge works` stays read-only. This
 deliberately narrow command boundary avoids treating policy, documentation, or
 review prose as an executable mutation.
+For example, `Document the npm test workflow` and `Explain how mkdir works`
+remain `inspect`.
 
 
 ## Verification

@@ -12,6 +12,9 @@ export function classifyAction(text) {
   ) return 'external-write';
   if (/\b(fetch|download|curl|get from|read from api|query)\b/.test(value) && /\b(http|api|remote|github)\b/.test(value)) return 'external-read';
   if (
+    /(?:^|\b(?:and\s+then|then)\s+)(?:(?:run|execute)\s+)?(?:git\s+commit\b|(?:npm|pnpm|bun)\s+(?:run\s+)?(?:test|build)\b|yarn\s+(?:run\s+)?(?:test|build)\b|(?:cp|mv|touch|mkdir)\b)/.test(value)
+  ) return 'local-change';
+  if (
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely)\s+)*(?:edit|write|commit|test|build|generate|create(?:\s+(?:a|the))?\s+file|update|move|copy|rename|touch|mkdir)\b/.test(value)
   ) return 'local-change';
   return 'inspect';
