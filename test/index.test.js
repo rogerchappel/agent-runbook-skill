@@ -246,7 +246,7 @@ test('CLI reports command-shaped local mutations without requiring approval', ()
   const plan = JSON.parse(output);
   assert.equal(plan.requiresApproval, false);
   assert.equal(plan.counts['local-change'], 10);
-  assert.equal(plan.counts.inspect, 8);
+  assert.equal(plan.counts.inspect, 9);
   assert.equal(plan.validation.length, 10);
   assert.ok(plan.validation.some(item => item.includes('npm install')));
   assert.ok(plan.validation.some(item => item.includes('git add')));
