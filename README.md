@@ -78,11 +78,15 @@ Destructive commands such as `Delete the production database`, `Remove the
 stale deployment`, `Run sudo rm ...`, or `Execute env FORCE=1 rmdir ...` are
 classified as `approval-required`. Imperative local filesystem actions such as
 `Create a file`, `Move the report`, or `Rename the draft` are `local-change`.
-Supported command-shaped local changes include `git commit`, package test and
-build commands (`npm`, `pnpm`, `yarn`, and `bun`), and the `cp`, `mv`, `touch`,
-and `mkdir` filesystem commands. These commands may begin an action, follow an
-explicit `then` / `and then` sequence, or use an explicit `Run` or `Execute`
-wrapper.
+Supported command-shaped local changes include `git add` and `git commit`;
+package test and build commands; install forms for `npm` (`install`, `i`,
+`ci`), `pnpm` (`install`, `i`, `add`), `yarn` (`install`, `add`), and `bun`
+(`install`, `add`); and the `cp`, `mv`, `touch`, and `mkdir` filesystem
+commands. These commands may begin an action, follow an explicit `then` /
+`and then` sequence, or use an explicit `Run` or `Execute` wrapper. Because
+`npx` can invoke arbitrary tools with different side effects, it is treated as
+a `local-change` only behind an explicit wrapper, such as
+`Run npx prettier --write .` or `then execute npx eslint --fix src`.
 Common command-shaped remote mutations—`git push`, `npm publish`, and
 `gh pr merge`—are classified as `external-write` when they begin an action or
 follow an explicit `then` / `and then` sequence. The same boundary accepts an
@@ -98,7 +102,8 @@ gh pr merge works` stays read-only. This
 deliberately narrow command boundary avoids treating policy, documentation, or
 review prose as an executable mutation.
 For example, `Document the npm test workflow` and `Explain how mkdir works`
-remain `inspect`.
+remain `inspect`. So do `Review the npm install policy`, `Document the git add
+workflow`, and an unwrapped `npx prettier --write .` action.
 
 
 ## Verification
@@ -121,6 +126,12 @@ at the start of an action or after command words and sequencing conjunctions.
 Domain-specific or unusually phrased actions can still be misclassified.
 Review output before using it in an automated workflow; a class is never
 authorization to execute the action.
+
+Package command matching covers the documented subcommands, not arbitrary
+package-manager aliases, plugins, shell operators, environment prefixes, or
+nested command strings. The classifier does not infer whether an `npx` tool is
+actually read-only; its explicit wrapper is a conservative signal that the
+runbook instructs execution.
 
 Runbook structure intentionally supports a small Markdown subset: ATX headings
 and unordered or ordered list markers documented above. Setext headings,

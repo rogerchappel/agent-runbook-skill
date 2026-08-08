@@ -17,5 +17,9 @@ backtick or tilde fences are ignored.
   they do not instruct the destructive operation.
 - Supported remote mutation commands may begin an action directly or follow
   `Run`, `Execute`, `then`, or `and then`; explanatory mentions remain read-only.
+- Supported local package commands are limited to documented test, build, and
+  install subcommands. `npx` is considered a local change only after an
+  explicit `Run` or `Execute` wrapper; the classifier does not determine the
+  invoked tool's exact behavior.
 - Outputs are review aids, not authorization to act.
 - Fixtures cover common cases and should grow with real use.
