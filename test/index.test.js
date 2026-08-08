@@ -83,6 +83,31 @@ test('classifies supported local commands directly and through execution wrapper
   ]) assert.equal(classifyAction(action), 'local-change', action);
 });
 
+test('classifies package, VCS, and wrapped tool mutations as local changes', () => {
+  for (const action of [
+    'npm install', 'npm i lodash', 'npm ci',
+    'pnpm install --frozen-lockfile', 'pnpm i pathsafe',
+    'yarn install --immutable', 'yarn add lodash',
+    'bun install', 'bun add lodash',
+    'git add src/index.js', 'Run git add --all',
+    'Run npx prettier --write .',
+    'Execute npx eslint --fix src/index.js',
+    'Check formatting and then run npx prettier --write .'
+  ]) assert.equal(classifyAction(action), 'local-change', action);
+});
+
+test('keeps package, VCS, and tool inspection prose read-only', () => {
+  for (const action of [
+    'Review the npm install policy',
+    'Document how pnpm install resolves packages',
+    'Explain when to use yarn add',
+    'Review how bun install updates its lockfile',
+    'Document the git add workflow',
+    'Review npx package selection',
+    'npx prettier --write .'
+  ]) assert.equal(classifyAction(action), 'inspect', action);
+});
+
 test('keeps external-write policy and review wording read-only', () => {
   for (const action of [
     'Review the policy for sending email',
@@ -220,9 +245,12 @@ test('CLI reports command-shaped local mutations without requiring approval', ()
   const output = execFileSync('node', ['bin/cli.js', 'fixtures/command-local-runbook.md', '--json'], { encoding: 'utf8' });
   const plan = JSON.parse(output);
   assert.equal(plan.requiresApproval, false);
-  assert.equal(plan.counts['local-change'], 4);
-  assert.equal(plan.counts.inspect, 2);
-  assert.equal(plan.validation.length, 4);
+  assert.equal(plan.counts['local-change'], 10);
+  assert.equal(plan.counts.inspect, 8);
+  assert.equal(plan.validation.length, 10);
+  assert.ok(plan.validation.some(item => item.includes('npm install')));
+  assert.ok(plan.validation.some(item => item.includes('git add')));
+  assert.ok(plan.validation.some(item => item.includes('Run npx prettier')));
 });
 
 test('ignores headings and actions inside fenced examples', () => {
