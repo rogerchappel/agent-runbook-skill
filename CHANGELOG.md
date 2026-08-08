@@ -8,6 +8,8 @@
 - Classify command-shaped `git push`, `npm publish`, and `gh pr merge` actions
   as external writes, including after explicit `Run` and `Execute` wrappers,
   without changing policy and review prose.
+- Classify common package install commands, `git add`, and explicitly wrapped
+  `npx` tools as local changes while preserving inspection prose.
 - Export the documented library API from the package root.
 - Ignore headings and actions inside fenced Markdown examples.
 - Install the packed artifact during package smoke tests and verify its
