@@ -2,7 +2,20 @@
 
 - Review how git commit records changes
 - Document the npm test workflow
+- Review the npm install policy
+- Document how pnpm install resolves packages
+- Explain when to use yarn add
+- Review how bun install updates its lockfile
+- Document the git add workflow
+- Review npx package selection
+- npx prettier --write .
 - Run git commit -am "update fixtures"
 - Execute npm run build
 - Copy the fixture, then mv fixture.tmp fixture.md
 - mkdir build-output
+- npm install
+- pnpm install --frozen-lockfile
+- yarn add lodash
+- bun install
+- git add src/index.js
+- Run npx prettier --write .

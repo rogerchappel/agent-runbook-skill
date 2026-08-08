@@ -1,3 +1,14 @@
+const COMMAND_POSITION = String.raw`(?:^|\b(?:and\s+then|then)\s+)`;
+const OPTIONAL_EXECUTION_WRAPPER = String.raw`(?:(?:run|execute)\s+)?`;
+const LOCAL_COMMAND_FAMILY = String.raw`(?:git\s+(?:add|commit)\b|npm\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|i|ci)\b)|pnpm\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|i|add)\b)|yarn\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|add)\b)|bun\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|add)\b)|(?:cp|mv|touch|mkdir)\b)`;
+
+const localCommandPattern = new RegExp(
+  `${COMMAND_POSITION}${OPTIONAL_EXECUTION_WRAPPER}${LOCAL_COMMAND_FAMILY}`
+);
+const wrappedNpxPattern = new RegExp(
+  String.raw`${COMMAND_POSITION}(?:run|execute)\s+npx\b`
+);
+
 export function classifyAction(text) {
   const value = text.toLowerCase();
   if (/\b(approval|approve|confirm|permission|human sign[- ]?off)\b/.test(value)) return 'approval-required';
@@ -11,9 +22,7 @@ export function classifyAction(text) {
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely)\s+)*(?:push|post|send|publish|deploy|merge|create(?:\s+(?:a|the))?\s+repo(?:sitory)?|open(?:\s+(?:a|the))?\s+(?:pr|pull request)|write\s+to\s+slack|email)\b/.test(value)
   ) return 'external-write';
   if (/\b(fetch|download|curl|get from|read from api|query)\b/.test(value) && /\b(http|api|remote|github)\b/.test(value)) return 'external-read';
-  if (
-    /(?:^|\b(?:and\s+then|then)\s+)(?:(?:run|execute)\s+)?(?:git\s+commit\b|(?:npm|pnpm|bun)\s+(?:run\s+)?(?:test|build)\b|yarn\s+(?:run\s+)?(?:test|build)\b|(?:cp|mv|touch|mkdir)\b)/.test(value)
-  ) return 'local-change';
+  if (localCommandPattern.test(value) || wrappedNpxPattern.test(value)) return 'local-change';
   if (
     /(?:^|\b(?:and(?:\s+then)?|then|run|execute)\s+)(?:(?:please|carefully|safely)\s+)*(?:edit|write|commit|test|build|generate|create(?:\s+(?:a|the))?\s+file|update|move|copy|rename|touch|mkdir)\b/.test(value)
   ) return 'local-change';
