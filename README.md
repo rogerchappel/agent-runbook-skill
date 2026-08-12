@@ -92,6 +92,10 @@ Common command-shaped remote mutations—`git push`, `npm publish`, and
 follow an explicit `then` / `and then` sequence. The same boundary accepts an
 explicit `Run` or `Execute` wrapper, including `Run git push origin main`,
 `Execute npm publish`, and `Build the package and then run gh pr merge 42`.
+Remote mutation commands also accept the supported execution prefixes `sudo`,
+`doas`, and `command`, plus `env` followed by one or more assignments. Prefixes
+may be combined after an optional wrapper, for example
+`Run sudo git push origin main` or `Execute env CI=1 npm publish`.
 For all of these forms, `buildPlan` requires approval and emits a validation
 item.
 Inspection wording such as `Review removal logs` remains `inspect`; mentioning
@@ -128,8 +132,9 @@ Review output before using it in an automated workflow; a class is never
 authorization to execute the action.
 
 Package command matching covers the documented subcommands, not arbitrary
-package-manager aliases, plugins, shell operators, environment prefixes, or
-nested command strings. The classifier does not infer whether an `npx` tool is
+package-manager aliases, plugins, shell operators, or nested command strings.
+Environment prefixes are supported only for the documented remote mutation
+commands. The classifier does not infer whether an `npx` tool is
 actually read-only; its explicit wrapper is a conservative signal that the
 runbook instructs execution.
 

@@ -16,7 +16,9 @@ backtick or tilde fences are ignored.
 - Inspection phrases that mention deletion or removal remain read-only when
   they do not instruct the destructive operation.
 - Supported remote mutation commands may begin an action directly or follow
-  `Run`, `Execute`, `then`, or `and then`; explanatory mentions remain read-only.
+  `Run`, `Execute`, `then`, or `and then`. They may then use `sudo`, `doas`,
+  `command`, or `env` with one or more assignments; explanatory mentions and
+  other prefixed commands remain read-only.
 - Supported local package commands are limited to documented test, build, and
   install subcommands. `npx` is considered a local change only after an
   explicit `Run` or `Execute` wrapper; the classifier does not determine the
