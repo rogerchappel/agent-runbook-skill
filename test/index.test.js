@@ -224,21 +224,64 @@ test('classifies supported remote mutation commands after execution wrappers', (
   ]);
 });
 
+test('classifies remote mutation commands through supported execution prefixes', () => {
+  for (const action of [
+    'sudo git push origin main',
+    'command npm publish --access public',
+    'env CI=1 gh pr merge 42 --squash',
+    'Run sudo git push origin release',
+    'Execute env CI=1 npm publish',
+    'Build the package and then command gh pr merge 42',
+    'Check the release notes, then run env CI=1 command git push origin release'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  for (const action of [
+    'sudo git status',
+    'command npm view agent-runbook-skill',
+    'env CI=1 git diff',
+    'Review the sudo git push policy',
+    'Document env CI=1 npm publish behavior'
+  ]) {
+    assert.equal(classifyAction(action), 'inspect', action);
+  }
+
+  const plan = buildPlan([
+    '## Release',
+    '- Run sudo git push origin release',
+    '- Execute env CI=1 npm publish'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 2);
+  assert.deepEqual(plan.validation, [
+    'Verify A01: Run sudo git push origin release',
+    'Verify A02: Execute env CI=1 npm publish'
+  ]);
+});
+
 test('CLI reports command-shaped remote mutations as approval-gated', () => {
   const output = execFileSync('node', ['bin/cli.js', 'fixtures/command-release-runbook.md', '--json'], { encoding: 'utf8' });
   const plan = JSON.parse(output);
 
   assert.equal(plan.requiresApproval, true);
-  assert.equal(plan.counts['external-write'], 3);
-  assert.equal(plan.counts.inspect, 2);
+  assert.equal(plan.counts['external-write'], 6);
+  assert.equal(plan.counts.inspect, 5);
   assert.deepEqual(plan.actions.map(({ text, sideEffect }) => ({ text, sideEffect })), [
     { text: 'Review the git push policy', sideEffect: 'inspect' },
     { text: 'Explain how gh pr merge works', sideEffect: 'inspect' },
     { text: 'Run git push origin release', sideEffect: 'external-write' },
     { text: 'Execute npm publish --access public', sideEffect: 'external-write' },
-    { text: 'Build the package and then run gh pr merge 42 --squash', sideEffect: 'external-write' }
+    { text: 'Build the package and then run gh pr merge 42 --squash', sideEffect: 'external-write' },
+    { text: 'Run sudo git push origin backup', sideEffect: 'external-write' },
+    { text: 'Execute env CI=1 npm publish --tag next', sideEffect: 'external-write' },
+    { text: 'then command gh pr merge 43 --merge', sideEffect: 'external-write' },
+    { text: 'sudo git status', sideEffect: 'inspect' },
+    { text: 'env CI=1 git diff', sideEffect: 'inspect' },
+    { text: 'Document command git push behavior', sideEffect: 'inspect' }
   ]);
-  assert.equal(plan.validation.length, 3);
+  assert.equal(plan.validation.length, 6);
 });
 
 test('CLI reports command-shaped local mutations without requiring approval', () => {
