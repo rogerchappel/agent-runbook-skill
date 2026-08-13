@@ -1,7 +1,7 @@
 const COMMAND_POSITION = String.raw`(?:^|\b(?:and\s+then|then)\s+)`;
 const OPTIONAL_EXECUTION_WRAPPER = String.raw`(?:(?:run|execute)\s+)?`;
 const OPTIONAL_COMMAND_PREFIXES = String.raw`(?:(?:(?:sudo|doas|command)\s+|env\s+(?:[a-z_][a-z0-9_]*=[^\s]+\s+)+))*`;
-const LOCAL_COMMAND_FAMILY = String.raw`(?:git\s+(?:add|commit)\b|npm\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|i|ci)\b)|pnpm\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|i|add)\b)|yarn\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|add)\b)|bun\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|add)\b)|(?:cp|mv|touch|mkdir)\b)`;
+const LOCAL_COMMAND_FAMILY = String.raw`(?:git\s+(?:add|commit)\b|npm\s+(?:(?:test|build)\b|run\s+(?:test|build|lint|check|smoke)\b|(?:install|i|ci)\b)|pnpm\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|i|add)\b)|yarn\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|add)\b)|bun\s+(?:(?:run\s+)?(?:test|build)\b|(?:install|add)\b)|(?:cp|mv|touch|mkdir)\b)`;
 const REMOTE_MUTATION_COMMAND_FAMILY = String.raw`(?:git\s+push|npm\s+publish|gh\s+pr\s+merge)\b`;
 
 const localCommandPattern = new RegExp(
