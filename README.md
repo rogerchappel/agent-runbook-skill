@@ -79,10 +79,11 @@ stale deployment`, `Run sudo rm ...`, or `Execute env FORCE=1 rmdir ...` are
 classified as `approval-required`. Imperative local filesystem actions such as
 `Create a file`, `Move the report`, or `Rename the draft` are `local-change`.
 Supported command-shaped local changes include `git add` and `git commit`;
-package test and build commands; install forms for `npm` (`install`, `i`,
-`ci`), `pnpm` (`install`, `i`, `add`), `yarn` (`install`, `add`), and `bun`
-(`install`, `add`); and the `cp`, `mv`, `touch`, and `mkdir` filesystem
-commands. These commands may begin an action, follow an explicit `then` /
+package test and build commands; the allowlisted `npm run lint`, `npm run
+check`, and `npm run smoke` verification scripts; install forms for `npm`
+(`install`, `i`, `ci`), `pnpm` (`install`, `i`, `add`), `yarn` (`install`,
+`add`), and `bun` (`install`, `add`); and the `cp`, `mv`, `touch`, and `mkdir`
+filesystem commands. These commands may begin an action, follow an explicit `then` /
 `and then` sequence, or use an explicit `Run` or `Execute` wrapper. Because
 `npx` can invoke arbitrary tools with different side effects, it is treated as
 a `local-change` only behind an explicit wrapper, such as
@@ -131,8 +132,9 @@ Domain-specific or unusually phrased actions can still be misclassified.
 Review output before using it in an automated workflow; a class is never
 authorization to execute the action.
 
-Package command matching covers the documented subcommands, not arbitrary
-package-manager aliases, plugins, shell operators, or nested command strings.
+Package command matching covers the documented subcommands and the allowlisted
+`npm run test`, `build`, `lint`, `check`, and `smoke` scripts, not arbitrary
+package-manager scripts, aliases, plugins, shell operators, or nested command strings.
 Environment prefixes are supported only for the documented remote mutation
 commands. The classifier does not infer whether an `npx` tool is
 actually read-only; its explicit wrapper is a conservative signal that the
