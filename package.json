@@ -17,6 +17,7 @@
     "test": "node --test",
     "smoke": "node bin/cli.js --help && node bin/cli.js --version && node bin/cli.js fixtures/release-runbook.md",
     "package:smoke": "node scripts/package-smoke.js",
+    "docs:smoke": "node scripts/validate-quickstart.mjs",
     "release:readiness": "node scripts/validate-release-readiness.mjs",
     "release:check": "bash scripts/validate.sh"
   },
