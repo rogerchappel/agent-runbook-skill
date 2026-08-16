@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Make the pre-release Quickstart executable from a local clone and label the
+  npm registry installation as a future post-publish path.
 - Add release-readiness checks for package metadata, pack contents, and CI verification.
 - Classify imperative destructive commands as approval-required while
   preserving read-only inspection wording.
