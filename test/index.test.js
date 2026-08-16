@@ -43,6 +43,42 @@ test('requires approval for destructive commands with execution prefixes', () =>
   }
 });
 
+test('requires approval for destructive filesystem and git commands', () => {
+  for (const action of [
+    'rm -rf ./build-cache',
+    'Run rmdir ./generated',
+    'Execute unlink ./obsolete-link',
+    'Clean the workspace and then git reset --hard HEAD~1',
+    'Run sudo git reset --hard origin/main',
+    'Execute env FORCE=1 command rm -rf ./dist'
+  ]) {
+    assert.equal(classifyAction(action), 'approval-required', action);
+  }
+
+  const plan = buildPlan([
+    '- rm -rf ./build-cache',
+    '- Run git reset --hard HEAD~1'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['approval-required'], 2);
+});
+
+test('classifies destructive remote commands as external writes', () => {
+  for (const action of [
+    'gh repo delete owner/project',
+    'Run gh repo delete owner/project --yes',
+    'Archive the logs and then execute gh repo delete owner/project',
+    'Run env GH_HOST=github.com command gh repo delete owner/project'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  const plan = buildPlan('- Execute gh repo delete owner/project --yes');
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 1);
+});
+
 test('classifies common local filesystem mutations as local changes', () => {
   for (const action of [
     'Create a file for the generated report',
@@ -66,7 +102,9 @@ test('keeps non-destructive inspection wording read-only', () => {
     'Review removal logs',
     'Check delete permissions',
     'Review how to move a file safely',
-    'Inspect sudo rm guidance'
+    'Inspect sudo rm guidance',
+    'Review the git reset --hard recovery policy',
+    'Document gh repo delete behavior'
   ]) {
     assert.equal(classifyAction(action), 'inspect', action);
   }
