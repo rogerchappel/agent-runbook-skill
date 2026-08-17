@@ -4,13 +4,28 @@ Turn Markdown runbooks into bounded dry-run agent action plans.
 
 ## Quickstart
 
+The package has not been published to npm yet. Run the current release
+candidate from a local clone:
+
 ```bash
-npm install -g agent-runbook-skill
-agent-runbook --help
-agent-runbook fixtures/release-runbook.md
+git clone https://github.com/rogerchappel/agent-runbook-skill.git
+cd agent-runbook-skill
+npm install
+node bin/cli.js --help
+node bin/cli.js fixtures/release-runbook.md
 npm test
 npm run smoke
 ```
+
+After the first npm release, the shorter registry installation path will be:
+
+```bash
+npm install --global agent-runbook-skill
+agent-runbook --help
+```
+
+Until that release exists, use the clone-based commands above; the registry
+command is shown only as the future published-package workflow.
 
 Run the full release-readiness gate before publishing or opening a release PR:
 

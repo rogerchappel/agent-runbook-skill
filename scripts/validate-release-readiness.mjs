@@ -17,7 +17,7 @@ requireField('main', pkg.main);
 requireField('exports["."]', pkg.exports?.['.']);
 requireField('bin.agent-runbook', pkg.bin?.['agent-runbook']);
 
-for (const script of ['check', 'test', 'smoke', 'package:smoke', 'release:check']) {
+for (const script of ['check', 'test', 'smoke', 'package:smoke', 'docs:smoke', 'release:check']) {
   requireField(`scripts.${script}`, pkg.scripts?.[script]);
 }
 
