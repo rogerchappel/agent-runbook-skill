@@ -108,6 +108,11 @@ merge`, and `gh repo delete`—are classified as `external-write` when they begi
 follow an explicit `then` / `and then` sequence. The same boundary accepts an
 explicit `Run` or `Execute` wrapper, including `Run git push origin main`,
 `Execute npm publish`, and `Build the package and then run gh pr merge 42`.
+At the start of an action, a wrapper may be preceded by `Please`, `Carefully`,
+or `Safely`, such as `Please run git push origin main`; these polite/adverb
+forms retain the same `external-write` classification. The prefix must lead
+directly into `Run` or `Execute`, so explanatory and policy prose remains
+read-only.
 Remote mutation commands also accept the supported execution prefixes `sudo`,
 `doas`, and `command`, plus `env` followed by one or more assignments. Prefixes
 may be combined after an optional wrapper, for example

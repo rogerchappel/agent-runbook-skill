@@ -298,6 +298,35 @@ test('classifies supported remote mutation commands after execution wrappers', (
   ]);
 });
 
+test('classifies remote mutation commands after polite execution wrappers', () => {
+  for (const action of [
+    'Please run git push origin main',
+    'Carefully execute npm publish --access public',
+    'Safely run gh pr merge 42 --squash',
+    'Please execute sudo git push origin release',
+    'Carefully run env CI=1 npm publish --tag next'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  for (const action of [
+    'Please review the git push policy',
+    'Carefully document how to execute npm publish',
+    'Safely explain how gh pr merge works'
+  ]) {
+    assert.equal(classifyAction(action), 'inspect', action);
+  }
+
+  const plan = buildPlan([
+    '## Release',
+    '- Please run git push origin release',
+    '- Carefully execute npm publish'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 2);
+});
+
 test('classifies remote mutation commands through supported execution prefixes', () => {
   for (const action of [
     'sudo git push origin main',
