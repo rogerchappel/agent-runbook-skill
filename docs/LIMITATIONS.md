@@ -2,11 +2,12 @@
 
 ## Markdown parsing
 
-Runbook structure is limited to ATX headings (`#` through `######`) and list
-items marked with `-`, `+`, `*`, `N.`, or `N)`. Task checkboxes after those
-markers are supported. Setext headings and list-like text without whitespace
-after its marker are not parsed. Headings and list items inside balanced
-backtick or tilde fences are ignored.
+Runbook structure is limited to ATX headings (`#` through `######`) with zero
+through three leading spaces and list items marked with `-`, `+`, `*`, `N.`, or
+`N)`. Task checkboxes after those markers are supported. Four-space-indented
+heading-like lines are treated as code. Setext headings and list-like text
+without whitespace after its marker are not parsed. Headings and list items
+inside balanced backtick or tilde fences are ignored.
 
 - Heuristic analysis can miss domain-specific language and unusually phrased
   commands.
