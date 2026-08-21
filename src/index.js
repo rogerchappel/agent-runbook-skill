@@ -56,7 +56,7 @@ export function parseRunbook(markdown) {
       fence = { marker: openingFence[1][0], length: openingFence[1].length };
       continue;
     }
-    const heading = raw.match(/^(#{1,6})\s+(.+)$/);
+    const heading = raw.match(/^\s{0,3}(#{1,6})\s+(.+)$/);
     if (heading) { section = heading[2].trim(); continue; }
     const task = raw.match(/^\s*(?:[-+*]|\d+[.)])\s+(?:\[[ xX]\]\s*)?(.+)$/);
     if (!task) continue;
