@@ -456,6 +456,44 @@ test('assigns actions under every ATX heading level', () => {
   ]);
 });
 
+test('accepts up to three leading spaces before ATX headings', () => {
+  const actions = parseRunbook([
+    '# Zero spaces',
+    '- Inspect zero',
+    ' # One space',
+    '- Inspect one',
+    '  ## Two spaces',
+    '- Inspect two',
+    '   ###### Three spaces',
+    '- Inspect three',
+    '    ### Four spaces is code',
+    '- Inspect four'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ section, text }) => ({ section, text })), [
+    { section: 'Zero spaces', text: 'Inspect zero' },
+    { section: 'One space', text: 'Inspect one' },
+    { section: 'Two spaces', text: 'Inspect two' },
+    { section: 'Three spaces', text: 'Inspect three' },
+    { section: 'Three spaces', text: 'Inspect four' }
+  ]);
+});
+
+test('keeps indented ATX-like headings inside fences from changing sections', () => {
+  const actions = parseRunbook([
+    '   ## Real section',
+    '   ```markdown',
+    '   ### Fenced section',
+    '- Publish from example',
+    '   ```',
+    '- Inspect after example'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ section, text }) => ({ section, text })), [
+    { section: 'Real section', text: 'Inspect after example' }
+  ]);
+});
+
 test('supports plus bullets and parenthesized ordered-list markers', () => {
   const actions = parseRunbook([
     '## Release',
