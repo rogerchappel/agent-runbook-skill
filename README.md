@@ -101,7 +101,11 @@ check`, and `npm run smoke` verification scripts; install forms for `npm`
 (`install`, `i`, `ci`), `pnpm` (`install`, `i`, `add`), `yarn` (`install`,
 `add`), and `bun` (`install`, `add`); and the `cp`, `mv`, `touch`, and `mkdir`
 filesystem commands. These commands may begin an action, follow an explicit `then` /
-`and then` sequence, or use an explicit `Run` or `Execute` wrapper. Because
+`and then` sequence, or use an explicit `Run` or `Execute` wrapper. Destructive
+commands accept the same optional `Please`, `Carefully`, or `Safely` prefix as
+remote mutations, including after a sequence boundary, so `Carefully execute
+git reset --hard HEAD~1` and `then please run sudo rm ...` remain
+`approval-required`. Because
 `npx` can invoke arbitrary tools with different side effects, it is treated as
 a `local-change` only behind an explicit wrapper, such as
 `Run npx prettier --write .` or `then execute npx eslint --fix src`.
@@ -160,8 +164,8 @@ authorization to execute the action.
 Package command matching covers the documented subcommands and the allowlisted
 `npm run test`, `build`, `lint`, `check`, and `smoke` scripts, not arbitrary
 package-manager scripts, aliases, plugins, shell operators, or nested command strings.
-Environment prefixes are supported only for the documented remote mutation
-commands. The classifier does not infer whether an `npx` tool is
+Environment prefixes are supported for the documented destructive and remote
+mutation commands. The classifier does not infer whether an `npx` tool is
 actually read-only; its explicit wrapper is a conservative signal that the
 runbook instructs execution.
 
