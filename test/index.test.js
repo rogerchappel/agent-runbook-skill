@@ -43,6 +43,29 @@ test('requires approval for destructive commands with execution prefixes', () =>
   }
 });
 
+test('requires approval for polite destructive wrappers and supported prefixes', () => {
+  for (const action of [
+    'Please run rm -rf ./build-cache',
+    'Carefully execute git reset --hard HEAD~1',
+    'Safely run sudo unlink ./obsolete-link',
+    'Please execute doas rmdir ./generated',
+    'Carefully run command rm -rf ./dist',
+    'Safely execute env FORCE=1 command git reset --hard origin/main',
+    'Inspect the logs and then carefully run sudo rm -rf ./cache',
+    'Back up the files, then please execute env FORCE=1 unlink ./old-link'
+  ]) {
+    assert.equal(classifyAction(action), 'approval-required', action);
+  }
+
+  const plan = buildPlan([
+    '- Carefully execute git reset --hard HEAD~1',
+    '- Safely run sudo rm -rf ./cache'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['approval-required'], 2);
+});
+
 test('requires approval for destructive filesystem and git commands', () => {
   for (const action of [
     'rm -rf ./build-cache',
@@ -104,7 +127,10 @@ test('keeps non-destructive inspection wording read-only', () => {
     'Review how to move a file safely',
     'Inspect sudo rm guidance',
     'Review the git reset --hard recovery policy',
-    'Document gh repo delete behavior'
+    'Document gh repo delete behavior',
+    'Carefully document the git reset --hard recovery policy',
+    'Review polite destructive-command guidance',
+    'Explain safe rm usage in the operator guide'
   ]) {
     assert.equal(classifyAction(action), 'inspect', action);
   }
