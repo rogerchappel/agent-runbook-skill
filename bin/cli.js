@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { buildPlan, renderMarkdown } from '../src/index.js';
 
 const args = process.argv.slice(2);
@@ -9,6 +9,24 @@ const usage = 'Usage: agent-runbook <runbook.md> [--json]';
 function usageError(message) {
   console.error(`${message}\n${usage}`);
   process.exit(2);
+}
+
+function inputError(file, reason) {
+  console.error(`Cannot read runbook "${file}": ${reason}.`);
+  process.exit(1);
+}
+
+function readRunbook(file) {
+  try {
+    if (!statSync(file).isFile()) inputError(file, 'path is not a file');
+    const bytes = readFileSync(file);
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch (error) {
+    if (error?.code === 'ENOENT') inputError(file, 'file not found');
+    if (error?.code === 'EACCES' || error?.code === 'EPERM') inputError(file, 'permission denied');
+    if (error instanceof TypeError) inputError(file, 'content is not valid UTF-8');
+    inputError(file, 'unable to read input');
+  }
 }
 
 const unknownOption = args.find(arg => arg.startsWith('-') && !['--json', '--help', '-h', '--version', '-v'].includes(arg));
@@ -33,5 +51,5 @@ if (!file) {
   usageError('Missing runbook path.');
 }
 if (positionals.length > 1) usageError(`Unexpected argument: ${positionals[1]}`);
-const plan = buildPlan(readFileSync(file, 'utf8'));
+const plan = buildPlan(readRunbook(file));
 process.stdout.write(json ? `${JSON.stringify(plan, null, 2)}\n` : renderMarkdown(plan));
