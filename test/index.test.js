@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { buildPlan, classifyAction, parseRunbook } from '../src/index.js';
 
 test('classifies runbook actions and approval boundaries', () => {
@@ -587,4 +589,53 @@ test('rejects unexpected extra positional arguments with a usage error', () => {
   assert.equal(result.status, 2);
   assert.match(result.stderr, /Unexpected argument: fixtures\/release-runbook\.md/);
   assert.match(result.stderr, /Usage: agent-runbook/);
+});
+
+test('reports deterministic runbook input errors in Markdown and JSON modes', () => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-runbook-cli-'));
+  const missing = join(root, 'missing.md');
+  const directory = join(root, 'directory.md');
+  const invalid = join(root, 'invalid.md');
+  mkdirSync(directory);
+  writeFileSync(invalid, Buffer.from([0x23, 0x20, 0xc3, 0x28]));
+
+  try {
+    for (const args of [[missing], [missing, '--json']]) {
+      const result = spawnSync('node', ['bin/cli.js', ...args], { encoding: 'utf8' });
+      assert.equal(result.status, 1);
+      assert.equal(result.stdout, '');
+      assert.equal(result.stderr, `Cannot read runbook "${missing}": file not found.\n`);
+      assert.doesNotMatch(result.stderr, /node:fs|\n\s+at /);
+    }
+
+    const directoryResult = spawnSync('node', ['bin/cli.js', directory], { encoding: 'utf8' });
+    assert.equal(directoryResult.status, 1);
+    assert.equal(directoryResult.stdout, '');
+    assert.equal(directoryResult.stderr, `Cannot read runbook "${directory}": path is not a file.\n`);
+
+    const invalidResult = spawnSync('node', ['bin/cli.js', invalid, '--json'], { encoding: 'utf8' });
+    assert.equal(invalidResult.status, 1);
+    assert.equal(invalidResult.stdout, '');
+    assert.equal(invalidResult.stderr, `Cannot read runbook "${invalid}": content is not valid UTF-8.\n`);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('reports unreadable runbook inputs without exposing Node internals', { skip: process.platform === 'win32' }, () => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-runbook-cli-'));
+  const unreadable = join(root, 'unreadable.md');
+  writeFileSync(unreadable, '# Runbook\n');
+  chmodSync(unreadable, 0o000);
+
+  try {
+    const result = spawnSync('node', ['bin/cli.js', unreadable], { encoding: 'utf8' });
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, `Cannot read runbook "${unreadable}": permission denied.\n`);
+    assert.doesNotMatch(result.stderr, /node:fs|\n\s+at /);
+  } finally {
+    chmodSync(unreadable, 0o600);
+    rmSync(root, { recursive: true, force: true });
+  }
 });
