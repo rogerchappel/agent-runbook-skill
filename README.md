@@ -53,6 +53,13 @@ The CLI accepts exactly one runbook path and the optional `--json` flag.
 Unknown options and extra positional arguments print usage and exit with status
 2.
 
+Successful plans exit with status 0. A runbook path that is missing, unreadable,
+not a regular file, or not valid UTF-8 prints one concise diagnostic to stderr
+and exits with status 1, without a stack trace. This input-error contract is the
+same in the default Markdown and `--json` modes; JSON is written only after the
+runbook has been read successfully. Command-line usage errors exit with status
+2 as described above.
+
 After global installation the same command is available as:
 
 ```bash
