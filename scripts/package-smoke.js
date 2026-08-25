@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -50,6 +50,13 @@ try {
     ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball],
     { cwd: consumerDirectory, stdio: "pipe" }
   );
+
+  const installedPackage = JSON.parse(
+    readFileSync(join(consumerDirectory, "node_modules", "agent-runbook-skill", "package.json"), "utf8")
+  );
+  if (installedPackage.engines?.node !== "^22.0.0 || ^24.0.0") {
+    throw new Error("Packed package is missing the supported Node.js engine range");
+  }
 
   execFileSync(
     process.execPath,

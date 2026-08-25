@@ -2,6 +2,7 @@ import { access, readFile, readdir } from 'node:fs/promises';
 
 const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 const failures = [];
+const supportedNodeRange = '^22.0.0 || ^24.0.0';
 
 function requireField(path, value) {
   if (value === undefined || value === null || value === '') {
@@ -16,6 +17,10 @@ requireField('license', pkg.license);
 requireField('main', pkg.main);
 requireField('exports["."]', pkg.exports?.['.']);
 requireField('bin.agent-runbook', pkg.bin?.['agent-runbook']);
+
+if (pkg.engines?.node !== supportedNodeRange) {
+  failures.push(`package.json engines.node must be ${supportedNodeRange}`);
+}
 
 for (const script of ['check', 'test', 'smoke', 'package:smoke', 'docs:smoke', 'release:check']) {
   requireField(`scripts.${script}`, pkg.scripts?.[script]);
@@ -44,6 +49,16 @@ for (const file of [
 const workflows = await readdir(new URL('../.github/workflows/', import.meta.url)).catch(() => []);
 if (!workflows.some((file) => file.endsWith('.yml') || file.endsWith('.yaml'))) {
   failures.push('no GitHub Actions workflow found');
+}
+
+const ciWorkflow = await readFile(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8').catch(() => '');
+if (!/^\s*node-version:\s*24\s*$/m.test(ciWorkflow)) {
+  failures.push('primary CI workflow must use Node.js 24');
+}
+
+const releaseWorkflow = await readFile(new URL('../.github/workflows/release-check.yml', import.meta.url), 'utf8').catch(() => '');
+if (!/^\s*node-version:\s*\[22, 24\]\s*$/m.test(releaseWorkflow)) {
+  failures.push('release-check matrix must cover Node.js 22 and 24');
 }
 
 if (failures.length > 0) {
