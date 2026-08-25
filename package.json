@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Turn Markdown runbooks into bounded dry-run agent action plans.",
   "type": "module",
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
+  },
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
