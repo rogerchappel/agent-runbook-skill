@@ -2,6 +2,12 @@
 
 Turn Markdown runbooks into bounded dry-run agent action plans.
 
+## Runtime support
+
+The supported Node.js release lines are 22 and 24, as declared by the
+`package.json` `engines` field. CI and the release gate exercise both lines;
+local development and the primary CI job use Node.js 24.
+
 ## Quickstart
 
 The package has not been published to npm yet. Run the current release

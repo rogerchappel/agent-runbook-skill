@@ -5,7 +5,8 @@ Use this checklist before cutting a public release for agent-runbook-skill.
 ## Required checks
 
 - Run `npm run release:check` from a clean checkout.
-- Confirm the CI release-readiness job passes on the release PR.
+- Confirm the CI release-readiness job passes on Node.js 24 and the release
+  matrix passes on every supported line (Node.js 22 and 24).
 - Review the npm pack dry-run output for unexpected files or missing runtime assets.
 - Exercise the CLI smoke path for `agent-runbook` with the checked-in fixture.
 
