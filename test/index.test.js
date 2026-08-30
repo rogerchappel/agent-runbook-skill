@@ -175,11 +175,39 @@ test('classifies repository verification scripts as local changes', () => {
   ]);
 });
 
+test('classifies release verification scripts as local changes', () => {
+  for (const action of [
+    'npm run release:check',
+    'Run npm run release:readiness',
+    'Execute npm run package:smoke',
+    'Review the output and then npm run release:check',
+    'Check the package and then execute npm run release:readiness'
+  ]) assert.equal(classifyAction(action), 'local-change', action);
+
+  const plan = buildPlan([
+    '## Release verification',
+    '- npm run release:check',
+    '- Run npm run release:readiness',
+    '- Check the tarball and then execute npm run package:smoke'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, false);
+  assert.equal(plan.counts['local-change'], 3);
+  assert.deepEqual(plan.validation, [
+    'Verify A01: npm run release:check',
+    'Verify A02: Run npm run release:readiness',
+    'Verify A03: Check the tarball and then execute npm run package:smoke'
+  ]);
+});
+
 test('keeps verification-script prose read-only and remote scripts approval-gated', () => {
   for (const action of [
     'Document the npm run lint workflow',
     'Explain when to run npm run check',
-    'Review how to execute npm run smoke safely'
+    'Review how to execute npm run smoke safely',
+    'Document the npm run release:check workflow',
+    'Explain when to run npm run release:readiness',
+    'Review how to execute npm run package:smoke safely'
   ]) assert.equal(classifyAction(action), 'inspect', action);
 
   assert.equal(classifyAction('npm run deploy'), 'external-write');
