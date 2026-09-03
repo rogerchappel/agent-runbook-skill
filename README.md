@@ -124,10 +124,12 @@ git reset --hard HEAD~1` and `then please run sudo rm ...` remain
 a `local-change` only behind an explicit wrapper, such as
 `Run npx prettier --write .` or `then execute npx eslint --fix src`.
 Common command-shaped remote mutations—`git push`, `npm publish`, `gh pr
-merge`, and `gh repo delete`—are classified as `external-write` when they begin an action or
+create`, `gh issue create`, `gh release create`, `gh pr merge`, and `gh repo
+delete`—are classified as `external-write` when they begin an action or
 follow an explicit `then` / `and then` sequence. The same boundary accepts an
 explicit `Run` or `Execute` wrapper, including `Run git push origin main`,
-`Execute npm publish`, and `Build the package and then run gh pr merge 42`.
+`Execute npm publish`, `Run gh issue create --title Bug`, and `Build the package
+and then run gh release create v1.0.0`.
 At the start of an action, a wrapper may be preceded by `Please`, `Carefully`,
 or `Safely`, such as `Please run git push origin main`; these polite/adverb
 forms retain the same `external-write` classification. The prefix must lead
@@ -143,7 +145,8 @@ Inspection wording such as `Review removal logs` remains `inspect`; mentioning
 a destructive or mutating operation while reviewing its policy is not itself
 an instruction to perform that operation. Likewise, prose such as `Review the
 git push policy`, `Document how to execute npm publish safely`, or `Explain how
-gh pr merge works` stays read-only. This
+gh pr merge works`, or `Document the gh release create workflow` stays
+read-only. This
 deliberately narrow command boundary avoids treating policy, documentation, or
 review prose as an executable mutation.
 The command recognizer intentionally covers named high-risk forms rather than
