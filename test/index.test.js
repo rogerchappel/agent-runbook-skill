@@ -321,6 +321,43 @@ test('classifies supported remote mutation commands as external writes', () => {
   ]);
 });
 
+test('classifies GitHub CLI creation commands as external writes', () => {
+  for (const action of [
+    'gh pr create --title "Fix"',
+    'gh issue create --title "Bug"',
+    'gh release create v0.1.0',
+    'Run gh pr create --fill',
+    'Execute gh issue create --web',
+    'Build the package and then gh release create v0.1.0',
+    'Check the notes, and then run env GH_HOST=github.com command gh release create v0.1.0'
+  ]) {
+    assert.equal(classifyAction(action), 'external-write', action);
+  }
+
+  for (const action of [
+    'Document the gh release create workflow',
+    'Explain how gh pr create works',
+    'Review gh issue create options'
+  ]) {
+    assert.equal(classifyAction(action), 'inspect', action);
+  }
+
+  const plan = buildPlan([
+    '## GitHub',
+    '- gh pr create --fill',
+    '- Run gh issue create --title Bug',
+    '- Document the gh release create workflow'
+  ].join('\n'));
+
+  assert.equal(plan.requiresApproval, true);
+  assert.equal(plan.counts['external-write'], 2);
+  assert.equal(plan.counts.inspect, 1);
+  assert.deepEqual(plan.validation, [
+    'Verify A01: gh pr create --fill',
+    'Verify A02: Run gh issue create --title Bug'
+  ]);
+});
+
 test('classifies supported remote mutation commands after execution wrappers', () => {
   for (const action of [
     'Run git push origin main',
