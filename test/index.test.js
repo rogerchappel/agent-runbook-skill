@@ -326,9 +326,14 @@ test('classifies GitHub CLI creation commands as external writes', () => {
     'gh pr create --title "Fix"',
     'gh issue create --title "Bug"',
     'gh release create v0.1.0',
+    'gh repo create demo --public',
     'Run gh pr create --fill',
     'Execute gh issue create --web',
+    'Run gh repo create demo --private',
     'Build the package and then gh release create v0.1.0',
+    'Build the package and then gh repo create demo --public',
+    'Check the notes, and then run command gh repo create demo --public',
+    'Execute env GH_HOST=github.com gh repo create demo --private',
     'Check the notes, and then run env GH_HOST=github.com command gh release create v0.1.0'
   ]) {
     assert.equal(classifyAction(action), 'external-write', action);
@@ -337,7 +342,9 @@ test('classifies GitHub CLI creation commands as external writes', () => {
   for (const action of [
     'Document the gh release create workflow',
     'Explain how gh pr create works',
-    'Review gh issue create options'
+    'Review gh issue create options',
+    'Document the gh repo create policy',
+    'Explain how gh repo create works'
   ]) {
     assert.equal(classifyAction(action), 'inspect', action);
   }
@@ -346,15 +353,17 @@ test('classifies GitHub CLI creation commands as external writes', () => {
     '## GitHub',
     '- gh pr create --fill',
     '- Run gh issue create --title Bug',
+    '- Execute gh repo create demo --private',
     '- Document the gh release create workflow'
   ].join('\n'));
 
   assert.equal(plan.requiresApproval, true);
-  assert.equal(plan.counts['external-write'], 2);
+  assert.equal(plan.counts['external-write'], 3);
   assert.equal(plan.counts.inspect, 1);
   assert.deepEqual(plan.validation, [
     'Verify A01: gh pr create --fill',
-    'Verify A02: Run gh issue create --title Bug'
+    'Verify A02: Run gh issue create --title Bug',
+    'Verify A03: Execute gh repo create demo --private'
   ]);
 });
 
