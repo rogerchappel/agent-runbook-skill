@@ -45,6 +45,9 @@ if (args.includes('--help') || args.includes('-h')) {
 }
 
 const json = args.includes('--json');
+if (args.filter(arg => arg === '--json').length > 1) {
+  usageError('The --json option may only be specified once.');
+}
 const positionals = args.filter(arg => arg !== '--json');
 const file = positionals[0];
 if (!file) {

@@ -55,9 +55,9 @@ node bin/cli.js fixtures/release-runbook.md --json
 node bin/cli.js --help
 ```
 
-The CLI accepts exactly one runbook path and the optional `--json` flag.
-Unknown options and extra positional arguments print usage and exit with status
-2.
+The CLI accepts exactly one runbook path and at most one `--json` flag, in
+either position. Repeated `--json` flags, unknown options, and extra positional
+arguments print usage and exit with status 2 without rendering a plan.
 
 Successful plans exit with status 0. A runbook path that is missing, unreadable,
 not a regular file, or not valid UTF-8 prints one concise diagnostic to stderr

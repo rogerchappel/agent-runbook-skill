@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Reject repeated `--json` CLI flags as usage errors instead of silently
+  accepting them.
 - Classify command-shaped `gh repo create` actions as approval-gated remote mutations.
 - Support Node.js 22 and 24 across package metadata, CI, release checks, and
   release documentation, with regression checks for the declared baseline.

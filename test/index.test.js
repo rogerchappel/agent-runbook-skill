@@ -665,6 +665,32 @@ test('rejects unexpected extra positional arguments with a usage error', () => {
   assert.match(result.stderr, /Usage: agent-runbook/);
 });
 
+test('accepts one --json flag before or after the runbook path', () => {
+  for (const args of [
+    ['fixtures/release-runbook.md', '--json'],
+    ['--json', 'fixtures/release-runbook.md']
+  ]) {
+    const result = spawnSync('node', ['bin/cli.js', ...args], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.doesNotThrow(() => JSON.parse(result.stdout));
+    assert.equal(result.stderr, '');
+  }
+});
+
+test('rejects repeated --json flags without rendering a plan', () => {
+  const result = spawnSync('node', [
+    'bin/cli.js',
+    'fixtures/release-runbook.md',
+    '--json',
+    '--json'
+  ], { encoding: 'utf8' });
+
+  assert.equal(result.status, 2);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /The --json option may only be specified once/);
+  assert.match(result.stderr, /Usage: agent-runbook/);
+});
+
 test('reports deterministic runbook input errors in Markdown and JSON modes', () => {
   const root = mkdtempSync(join(tmpdir(), 'agent-runbook-cli-'));
   const missing = join(root, 'missing.md');
