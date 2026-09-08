@@ -4,7 +4,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { buildPlan, classifyAction, parseRunbook } from '../src/index.js';
+import { buildPlan, classifyAction, parseRunbook, renderMarkdown } from '../src/index.js';
 
 test('classifies runbook actions and approval boundaries', () => {
   const plan = buildPlan(readFileSync(new URL('../fixtures/release-runbook.md', import.meta.url), 'utf8'));
@@ -611,6 +611,42 @@ test('supports plus bullets and parenthesized ordered-list markers', () => {
     { text: 'Publish the package', sideEffect: 'external-write' },
     { text: 'Confirm human sign-off', sideEffect: 'approval-required' }
   ]);
+});
+
+test('treats four-space-indented list-like lines as Markdown code', () => {
+  const actions = parseRunbook([
+    '## Actions',
+    '- Inspect the real action',
+    '   - Publish with three spaces',
+    '    - Delete production data',
+    '    1. Publish a release',
+    '    2) Send an email',
+    '    * [x] Remove backups',
+    '\t- Deploy from tab-indented code'
+  ].join('\n'));
+
+  assert.deepEqual(actions.map(({ text }) => text), [
+    'Inspect the real action',
+    'Publish with three spaces'
+  ]);
+});
+
+test('renders source Markdown and HTML as inert report text', () => {
+  const source = [
+    '## Release <em>owned</em> [link](https://example.com)',
+    '- Publish **now** <script>alert(1)</script> `npm publish`',
+    '- Update [label](https://example.com) & verify _carefully_'
+  ].join('\n');
+  const plan = buildPlan(source);
+  const snapshot = JSON.stringify(plan);
+  const output = renderMarkdown(plan);
+
+  assert.ok(output.includes('Release &lt;em&gt;owned&lt;/em&gt; \\[link\\]\\(https://example\\.com\\)'));
+  assert.ok(output.includes('Publish \\*\\*now\\*\\* &lt;script&gt;alert\\(1\\)&lt;/script&gt; \\`npm publish\\`'));
+  assert.ok(output.includes('Verify A02: Update \\[label\\]\\(https://example\\.com\\) &amp; verify \\_carefully\\_'));
+  assert.equal(renderMarkdown(plan), output);
+  assert.equal(JSON.stringify(plan), snapshot);
+  assert.equal(plan.actions[0].text, 'Publish **now** <script>alert(1)</script> `npm publish`');
 });
 
 test('ignores added Markdown syntax inside fences and malformed list-like prose', () => {
