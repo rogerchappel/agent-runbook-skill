@@ -90,7 +90,14 @@ tilde code fences, so example commands do not become executable plan actions.
 Outside fences, it recognizes ATX headings from `#` through `######` with zero
 through three leading spaces, plus list items beginning with `-`, `+`, `*`,
 `N.`, or `N)` (including task checkboxes). Four-space-indented heading-like
-lines are treated as code rather than headings.
+lines and list-like lines are treated as indented code rather than headings or
+actions; tab-indented list-like lines are treated as code too. Zero through
+three literal leading spaces remain valid for list items.
+
+`renderMarkdown` preserves the plan's original JSON values while escaping
+Markdown punctuation and raw HTML in section names, action text, and validation
+text. Source links, emphasis, code spans, and HTML therefore appear literally
+in the generated report instead of changing its structure or rendering.
 
 ## Safety Notes
 
