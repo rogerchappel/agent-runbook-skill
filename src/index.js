@@ -57,7 +57,7 @@ export function parseRunbook(markdown) {
     }
     const heading = raw.match(/^\s{0,3}(#{1,6})\s+(.+)$/);
     if (heading) { section = heading[2].trim(); continue; }
-    const task = raw.match(/^\s*(?:[-+*]|\d+[.)])\s+(?:\[[ xX]\]\s*)?(.+)$/);
+    const task = raw.match(/^ {0,3}(?:[-+*]|\d+[.)])\s+(?:\[[ xX]\]\s*)?(.+)$/);
     if (!task) continue;
     const text = task[1].trim();
     if (!text || text.length < 4) continue;
@@ -73,11 +73,21 @@ export function buildPlan(markdown) {
   return { actions, counts, validation, requiresApproval: actions.some(a => ['external-write','approval-required'].includes(a.sideEffect)) };
 }
 
+function escapeMarkdown(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replace(/([\\`*_[\]{}()#+\-.!|])/g, '\\$1');
+}
+
 export function renderMarkdown(plan) {
   const lines = ['# Agent Runbook Dry Run', '', `Approval required: ${plan.requiresApproval ? 'yes' : 'no'}`, '', '## Actions'];
-  for (const action of plan.actions) lines.push(`- ${action.id} [${action.sideEffect}] (${action.section}) ${action.text}`);
+  for (const action of plan.actions) {
+    lines.push(`- ${action.id} [${action.sideEffect}] (${escapeMarkdown(action.section)}) ${escapeMarkdown(action.text)}`);
+  }
   lines.push('', '## Validation');
   if (plan.validation.length === 0) lines.push('- No mutable actions detected; preserve source notes as evidence.');
-  for (const item of plan.validation) lines.push(`- ${item}`);
+  for (const item of plan.validation) lines.push(`- ${escapeMarkdown(item)}`);
   return lines.join('\n') + '\n';
 }
