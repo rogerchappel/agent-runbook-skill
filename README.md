@@ -2,6 +2,8 @@
 
 Turn Markdown runbooks into bounded dry-run agent action plans.
 
+This tool transforms Markdown runbooks into structured, executable agent action plans that can be safely evaluated in a dry-run environment. It's designed for teams that want to codify their operational procedures and ensure they're properly understood and testable before execution.
+
 ## Runtime support
 
 The supported Node.js release lines are 22 and 24, as declared by the
