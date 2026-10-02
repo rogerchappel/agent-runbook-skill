@@ -52,8 +52,9 @@ if (!workflows.some((file) => file.endsWith('.yml') || file.endsWith('.yaml'))) 
 }
 
 const ciWorkflow = await readFile(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8').catch(() => '');
-if (!/^\s*node-version:\s*24\s*$/m.test(ciWorkflow)) {
-  failures.push('primary CI workflow must use Node.js 24');
+if (!/^\s*node-version:\s*\$\{\{\s*matrix\.node-version\s*\}\}\s*$/m.test(ciWorkflow)
+  || !/^\s*node-version:\s*\[22, 24\]\s*$/m.test(ciWorkflow)) {
+  failures.push('primary CI workflow must run its release gate on Node.js 22 and 24');
 }
 
 const releaseWorkflow = await readFile(new URL('../.github/workflows/release-check.yml', import.meta.url), 'utf8').catch(() => '');
