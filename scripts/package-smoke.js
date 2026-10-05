@@ -22,6 +22,7 @@ try {
   const required = [
     "bin/cli.js",
     "src/index.js",
+    "scripts/validate-release-readiness.mjs",
     "fixtures/release-runbook.md",
     "docs/PRD.md",
     "docs/TASKS.md",
