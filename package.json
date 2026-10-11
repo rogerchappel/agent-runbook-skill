@@ -37,8 +37,6 @@
   "files": [
     "bin",
     "src",
-    "scripts/package-smoke.js",
-    "scripts/validate-release-readiness.mjs",
     "docs",
     "fixtures",
     "SKILL.md",
