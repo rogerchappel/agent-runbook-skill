@@ -29,8 +29,7 @@ for (const script of ['check', 'test', 'smoke', 'package:smoke', 'docs:smoke', '
 for (const file of [
   'bin',
   'src',
-  'scripts/package-smoke.js',
-  'scripts/validate-release-readiness.mjs',
+  'scripts',
   'docs',
   'fixtures',
   'SKILL.md',
